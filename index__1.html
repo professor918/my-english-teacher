@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#0f172a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>My English Teacher</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0f172a;color:#e5e7eb;min-height:100vh}
+#app{max-width:600px;margin:0 auto;padding:12px 12px 150px}
+h1{font-size:19px;margin:4px 0 10px}
+.card{background:#1e293b;border-radius:16px;padding:14px;margin-bottom:12px}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-size:16px;font-weight:600;color:#fff;background:#334155;cursor:pointer}
+.btn.main{background:#2563eb}.btn.mic{background:#dc2626}.btn.mic.on{background:#16a34a}.btn.red{background:#7f1d1d}
+.btn.small{padding:7px 11px;font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center}
+.chips{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.chip{padding:7px 14px;border-radius:999px;background:#334155;font-size:14px;cursor:pointer}
+.chip.on{background:#2563eb}
+.ur{direction:rtl;text-align:right;font-family:"Noto Nastaliq Urdu","Jameel Noori Nastaleeq",system-ui,sans-serif;line-height:2}
+small,.muted{color:#94a3b8}
+.hidden{display:none!important}
+/* chat */
+.bar{display:flex;align-items:center;justify-content:space-between;background:#1e293b;border-radius:14px;padding:10px 12px;margin-bottom:10px;gap:8px}
+.dots span{display:inline-block;width:9px;height:9px;border-radius:50%;background:#334155;margin-left:4px}
+.dots span.g{background:#22c55e}.dots span.r{background:#ef4444}
+.b{max-width:92%;padding:11px 13px;border-radius:16px;margin:8px 0;line-height:1.5}
+.b.t{background:#1e293b;border-bottom-left-radius:4px}
+.b.t .en{font-size:19px;font-weight:600}
+.b.t .urt{font-size:15px;color:#a5b4fc;margin-top:6px;border-top:1px solid #334155;padding-top:6px}
+.b.u{background:#2563eb;margin-left:auto;border-bottom-right-radius:4px;font-size:17px}
+.sys{text-align:center;color:#94a3b8;font-size:14px;margin:10px 0}
+.fixc{border:2px solid #f59e0b;background:#241a06;border-radius:14px;padding:10px 12px;margin:8px 0}
+.fixc .said{color:#fca5a5;text-decoration:line-through;font-size:17px}
+.fixc .corr{color:#86efac;font-size:19px;font-weight:700}
+.rep{border:2px dashed #38bdf8;border-radius:14px;padding:10px 12px;margin:8px 0;background:#082f49}
+.rep.done{border-color:#22c55e;background:#052e16;opacity:.8}
+.w{display:inline-block;padding:2px 6px;margin:2px;border-radius:8px}
+.ok{background:#14532d;color:#bbf7d0}.close{background:#713f12;color:#fde68a}.bad{background:#7f1d1d;color:#fecaca}.miss{background:#7f1d1d;color:#fecaca;text-decoration:line-through}
+.typing{color:#94a3b8;font-size:14px;margin:8px 0}
+.inbar{position:fixed;left:0;right:0;bottom:56px;background:#0b1220;border-top:1px solid #334155;padding:8px;display:flex;gap:8px;max-width:600px;margin:0 auto}
+.inbar input{flex:1;min-width:0;font-size:16px;padding:12px;border-radius:12px;border:0;background:#1e293b;color:#fff}
+.inbar .btn{padding:12px 14px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#111827;display:flex;border-top:1px solid #334155;height:56px}
+nav div{flex:1;text-align:center;padding:8px 2px;font-size:12px;cursor:pointer;color:#94a3b8}
+nav div.on{color:#fff;background:#1e293b}
+.lock{position:fixed;inset:0;background:#0f172a;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;text-align:center}
+.lock input{font-size:28px;text-align:center;letter-spacing:10px;width:200px;padding:10px;border-radius:12px;border:0;background:#1e293b;color:#fff}
+.item{border-bottom:1px solid #334155;padding:10px 0}
+.item:last-child{border:0}
+input.f,select.f{width:100%;font-size:16px;padding:11px;border-radius:10px;border:0;background:#0f172a;color:#fff;margin-top:6px}
+label{display:block;margin-top:10px}
+.av{width:68px;height:68px;flex:none;border-radius:50%;background:radial-gradient(circle at 50% 35%,#1e3a8a,#0b1220);overflow:hidden;border:2px solid #334155;box-shadow:0 0 14px rgba(34,211,238,.25)}
+.av svg{width:100%;height:100%;display:block}
+.av .bot{animation:float 3.2s ease-in-out infinite}
+.av .look{animation:look 7s ease-in-out infinite}
+.av .eye{transform-box:fill-box;transform-origin:center;animation:blink 4.2s infinite}
+.av .ant{animation:pulse 2s ease-in-out infinite}
+.av .chest{animation:pulse 2.6s ease-in-out infinite}
+.av .mouth{transform-box:fill-box;transform-origin:center;transform:scaleY(.55)}
+.av.talk{border-color:#22d3ee;box-shadow:0 0 18px rgba(34,211,238,.7)}
+.av.talk .mouth{animation:talk .24s infinite}
+.av.talk .ant{animation-duration:.5s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}
+@keyframes look{0%,100%{transform:translateX(0)}30%{transform:translateX(2.5px)}65%{transform:translateX(-2.5px)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.08)}}
+@keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+@keyframes talk{0%,100%{transform:scaleY(.5)}25%{transform:scaleY(2.4)}50%{transform:scaleY(1)}75%{transform:scaleY(3)}}
+.barL{display:flex;align-items:center;gap:10px}
+.stat{display:flex;gap:10px;margin-bottom:10px}
+.stat div{flex:1;background:#1e293b;border-radius:12px;padding:10px;text-align:center;font-size:14px}
+.stat b{display:block;font-size:22px}
+</style>
+</head>
+<body>
+
+<div id="lock" class="lock">
+  <div style="font-size:44px">🔒</div>
+  <h1>My English Teacher</h1>
+  <div id="lockMsg" class="ur"></div>
+  <input id="pin" type="password" inputmode="numeric" maxlength="4" placeholder="••••">
+  <button class="btn main" id="pinBtn">OK</button>
+</div>
+
+<div id="app" class="hidden">
+
+  <!-- TEACHER -->
+  <div id="tab-teach">
+    <div class="bar">
+      <div class="barL"><div class="av" id="avatar"></div><div><b>Nova</b> <span style="font-size:12px;color:#22d3ee">AI Teacher</span><br><b id="lvName" style="font-size:13px;color:#93c5fd"></b><br><small class="ur" id="lvHint"></small></div></div>
+      <div class="dots" id="dots"></div>
+    </div>
+    <div id="keyBanner" class="card hidden">
+      <div class="ur"><b>پہلے ایک بار AI کی چابی (API key) لگانی ہے — بالکل مفت ہے:</b><br>
+      1) <b>aistudio.google.com</b> کھولیں اور Google اکاؤنٹ سے لاگ اِن کریں۔<br>
+      2) <b>Get API key</b> پھر <b>Create API key</b> دبائیں۔<br>
+      3) جو لمبی چابی ملے اسے کاپی کر کے نیچے پیسٹ کریں۔</div>
+      <input class="f" id="keyIn" placeholder="Paste API key here">
+      <div class="row"><button class="btn main" id="keySave">Save key</button></div>
+    </div>
+    <div id="chat"></div>
+    <div id="typing" class="typing hidden">Teacher is thinking...</div>
+    <div class="inbar">
+      <input id="msg" placeholder="Type in English... / انگلش میں لکھیں" autocomplete="off">
+      <button class="btn mic" id="mic">🎤</button>
+      <button class="btn main" id="send">➤</button>
+    </div>
+  </div>
+
+  <!-- MISTAKES -->
+  <div id="tab-mist" class="hidden">
+    <h1>❌ My Mistakes — دوبارہ دہرائیں</h1>
+    <div class="stat">
+      <div><b id="sToday">0</b>آج غلطیاں</div>
+      <div><b id="sFixed">0</b>آج ٹھیک کیں</div>
+      <div><b id="sPend">0</b>ابھی باقی</div>
+    </div>
+    <div class="chips" id="mFilter">
+      <div class="chip on" data-f="pending">Pending</div>
+      <div class="chip" data-f="today">Today</div>
+      <div class="chip" data-f="fixed">Fixed ✅</div>
+    </div>
+    <div class="card" id="mList"></div>
+  </div>
+
+  <!-- POINTS -->
+  <div id="tab-pts" class="hidden">
+    <h1>📚 Saved Points — جو سیکھا</h1>
+    <div class="card" id="pList"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="tab-set" class="hidden">
+    <h1>⚙ Settings</h1>
+    <div class="card">
+      <b>Level</b>
+      <select class="f" id="lvSel"></select>
+      <div class="ur muted">ٹیچر آپ کی کارکردگی دیکھ کر خود بھی لیول بدلتا ہے۔</div>
+      <label><input type="checkbox" id="optSpeak"> ٹیچر کی آواز خود چلائیں</label>
+      <label><input type="checkbox" id="optUr"> اردو ترجمہ دکھائیں</label>
+      <label>آواز کی رفتار
+        <select class="f" id="optRate"><option value="1">Normal</option><option value="0.8">Slow</option><option value="0.65">Very slow</option></select>
+      </label>
+    </div>
+    <div class="card">
+      <b>AI API key (Google Gemini — free)</b>
+      <input class="f" id="keyIn2" type="password" placeholder="Paste API key">
+      <label>Model <small>(عام طور پر نہ بدلیں)</small><input class="f" id="modelIn" placeholder="gemini-flash-latest"></label>
+      <div class="row"><button class="btn main small" id="keySave2">Save</button></div>
+      <div class="ur muted">چابی صرف آپ کے فون میں محفوظ رہتی ہے۔</div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <button class="btn small main" id="installBtn">📲 Install app</button>
+        <button class="btn small" id="testAI">🔌 Test AI connection</button>
+      </div>
+      <div class="ur muted" id="installHelp">اگر Install کا بٹن کام نہ کرے تو Chrome کے ⋮ مینو میں "Install app" یا "Add to Home screen" دبائیں۔</div>
+      <div class="row">
+        <button class="btn small" id="newLesson">🔄 New lesson (chat صاف)</button>
+        <button class="btn small red" id="resetAll">🗑 Reset everything</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav id="nav" class="hidden">
+  <div data-t="teach" class="on">🎓<br>Teacher</div>
+  <div data-t="mist">❌<br>Mistakes</div>
+  <div data-t="pts">📚<br>Saved</div>
+  <div data-t="set">⚙<br>Settings</div>
+</nav>
+
+<script>
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+/* ================= PIN ================= */
+function hash(s){let h=7;for(const c of s+'et-salt')h=(h*31+c.charCodeAt(0))>>>0;return String(h)}
+function initLock(){
+  const saved=store.get('pin',null);
+  $('#lock').classList.remove('hidden');$('#app').classList.add('hidden');$('#nav').classList.add('hidden');
+  $('#pin').value='';
+  $('#lockMsg').textContent=saved?'اپنا 4 ہندسوں کا PIN لکھیں':'پہلی بار: اپنے لیے 4 ہندسوں کا نیا PIN بنائیں';
+  $('#pinBtn').onclick=()=>{
+    const v=$('#pin').value.trim();
+    if(!/^\d{4}$/.test(v)){$('#lockMsg').textContent='PIN بالکل 4 ہندسوں کا ہونا چاہیے';return}
+    if(!saved){store.set('pin',hash(v));openApp()}
+    else if(saved===hash(v))openApp();
+    else{$('#lockMsg').textContent='❌ غلط PIN';$('#pin').value=''}
+  };
+}
+$('#pin').addEventListener('keydown',e=>{if(e.key==='Enter')$('#pinBtn').click()});
+
+/* ================= Speech ================= */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let voice=null;
+function pickVoice(){const vs=speechSynthesis.getVoices();voice=vs.find(v=>/en[-_]US/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||null}
+if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+function say(text,rate,queue){
+  if(!('speechSynthesis' in window)||!text)return;
+  if(!queue)speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=rate||parseFloat(store.get('rate',1));if(voice)u.voice=voice;
+  speechSynthesis.speak(u);
+}
+let rec=null;
+function listen(btn,onInterim,onFinal,onErr){
+  if(!SR){onErr('اس براؤزر میں مائیک کی سپیچ پہچان نہیں چلتی۔ Android پر Chrome استعمال کریں۔');return}
+  if(rec){try{rec.stop()}catch(e){}return}
+  if('speechSynthesis' in window)speechSynthesis.cancel();
+  const r=new SR();rec=r;r.lang='en-US';r.interimResults=true;r.maxAlternatives=1;r.continuous=false;
+  let finalText='',any=false;
+  btn.classList.add('on');const old=btn.textContent;btn.textContent='🎙';
+  r.onresult=e=>{
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal){finalText+=t+' ';any=true}else interim+=t;
+    }
+    onInterim((finalText+interim).trim());
+  };
+  r.onerror=e=>{
+    if(e.error==='not-allowed'||e.error==='service-not-allowed')onErr('مائیک کی اجازت نہیں ملی۔ براؤزر کی سیٹنگ میں اس سائٹ کو Microphone allow کریں۔');
+    else if(e.error==='no-speech')onErr('کوئی آواز نہیں آئی۔ دوبارہ کوشش کریں۔');
+    else if(e.error!=='aborted')onErr('خرابی: '+e.error);
+  };
+  r.onend=()=>{rec=null;btn.classList.remove('on');btn.textContent=old;if(any)onFinal(finalText.trim())};
+  try{r.start()}catch(e){rec=null;btn.classList.remove('on');btn.textContent=old}
+}
+
+/* ================= Compare words ================= */
+const CONTR={"i'm":"i am","you're":"you are","we're":"we are","they're":"they are","it's":"it is","he's":"he is","she's":"she is","that's":"that is","don't":"do not","doesn't":"does not","didn't":"did not","can't":"cannot","won't":"will not","i'll":"i will","i've":"i have","isn't":"is not","aren't":"are not","let's":"let us","what's":"what is"};
+function norm(s){
+  s=String(s).toLowerCase().replace(/[’`]/g,"'");
+  const w=s.replace(/[^a-z0-9' ]/g,' ').split(/\s+/).filter(Boolean);
+  const out=[];
+  for(const x of w){const c=CONTR[x];if(c)out.push(...c.split(' '));else out.push(x.replace(/'/g,''))}
+  return out;
+}
+function lev(a,b){
+  const m=a.length,n=b.length;if(!m)return n;if(!n)return m;
+  let prev=Array.from({length:n+1},(_,i)=>i);
+  for(let i=1;i<=m;i++){const cur=[i];for(let j=1;j<=n;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=cur}
+  return prev[n];
+}
+function align(exp,got){
+  const n=exp.length,m=got.length;
+  const dp=Array.from({length:n+1},()=>Array(m+1).fill(0));
+  for(let i=1;i<=n;i++)dp[i][0]=i;for(let j=1;j<=m;j++)dp[0][j]=j;
+  const sub=(a,b)=>a===b?0:(lev(a,b)<=Math.max(1,Math.floor(Math.max(a.length,b.length)*0.34))?0.5:1);
+  for(let i=1;i<=n;i++)for(let j=1;j<=m;j++)
+    dp[i][j]=Math.min(dp[i-1][j]+1,dp[i][j-1]+0.8,dp[i-1][j-1]+sub(exp[i-1],got[j-1]));
+  const res=[];let i=n,j=m;
+  while(i>0||j>0){
+    if(i>0&&j>0&&Math.abs(dp[i][j]-(dp[i-1][j-1]+sub(exp[i-1],got[j-1])))<1e-9){
+      const s=sub(exp[i-1],got[j-1]);
+      res.unshift({w:exp[i-1],heard:got[j-1],st:s===0?'ok':(s===0.5?'close':'bad')});i--;j--;
+    }else if(i>0&&Math.abs(dp[i][j]-(dp[i-1][j]+1))<1e-9){res.unshift({w:exp[i-1],heard:'',st:'miss'});i--}
+    else{j--}
+  }
+  return res;
+}
+function compare(expected,heard){
+  const exp=norm(expected),got=norm(heard);
+  const r=align(exp,got);
+  let ok=0,close=0;r.forEach(x=>{if(x.st==='ok')ok++;else if(x.st==='close')close++});
+  const pct=Math.round((ok+close*0.5)/Math.max(1,exp.length)*100);
+  const html=r.map(x=>`<span class="w ${x.st}">${esc(x.w)}</span>`).join('');
+  return {pct,html,r};
+}
+
+/* ================= Levels ================= */
+const LEVELS=[
+ {n:'Level 1 · Starter',u:'بالکل شروع — چھوٹے جملے',d:'Absolute beginner (A1). Greetings, name, age, family, colors, numbers. Sentences of 4-8 words. Use only present simple and "to be". Teach one tiny thing at a time.'},
+ {n:'Level 2 · Basic',u:'روزمرہ زندگی',d:'Basic (A1+/A2). Daily routine, food, home, work, can/can\'t, there is/are, simple questions. Sentences up to 10 words.'},
+ {n:'Level 3 · Elementary',u:'ماضی اور مستقبل',d:'Elementary (A2). Past simple, future (will/going to), comparatives, likes/dislikes, simple opinions. Sentences up to 12 words.'},
+ {n:'Level 4 · Intermediate',u:'اپنی بات تفصیل سے',d:'Intermediate (B1). Present perfect, first conditional, giving reasons and opinions, telling short stories, connectors (because, but, so, although).'},
+ {n:'Level 5 · Upper-Intermediate',u:'روانی اور محاورے',d:'Upper-intermediate (B2). Second/third conditionals, passive voice, phrasal verbs, debating, longer answers, natural everyday expressions.'},
+ {n:'Level 6 · Advanced',u:'ایڈوانس گفتگو',d:'Advanced (C1). Idioms, nuance, formal vs informal register, abstract topics, precise vocabulary, fluent long answers.'}
+];
+const lvl=()=>Math.min(6,Math.max(1,store.get('level',1)));
+function renderBar(){
+  const L=LEVELS[lvl()-1];
+  $('#lvName').textContent=L.n;$('#lvHint').textContent=L.u;
+  const w=store.get('win',[]);
+  let h='';for(let i=0;i<6;i++){const v=w[i];h+=`<span class="${v===1?'g':v===0?'r':''}"></span>`}
+  $('#dots').innerHTML=h;
+}
+function updateLevel(clean){
+  let w=store.get('win',[]);w.push(clean?1:0);w=w.slice(-6);
+  const good=w.reduce((a,b)=>a+b,0);let note=null;
+  if(w.length>=6){
+    if(good>=5&&lvl()<6){store.set('level',lvl()+1);w=[];note='🎉 شاباش! آپ اگلے لیول پر پہنچ گئے: '+LEVELS[lvl()-1].n}
+    else if(good<=1&&lvl()>1){store.set('level',lvl()-1);w=[];note='کوئی بات نہیں، ہم تھوڑا آسان لیول سے مضبوط بنیاد بناتے ہیں: '+LEVELS[lvl()-1].n}
+  }
+  store.set('win',w);renderBar();
+  if(note)addItem({t:'sys',text:note});
+}
+
+/* ================= Chat state ================= */
+let chat=store.get('chat',[]);
+let hist=store.get('hist',[]);
+let pending=store.get('pending',null);
+let busy=false;
+
+function addItem(it){chat.push(it);store.set('chat',chat.slice(-60));chat=chat.slice(-60);drawItem(it);scrollEnd()}
+function scrollEnd(){setTimeout(()=>window.scrollTo(0,document.body.scrollHeight),50)}
+
+function itemHTML(it){
+  if(it.t==='teacher'){
+    const showUr=store.get('showUr',true);
+    return `<div class="b t"><div class="en">${esc(it.en)}</div>${showUr&&it.ur?`<div class="urt ur">${esc(it.ur)}</div>`:''}<div class="row"><button class="btn small" data-say="${esc(it.en)}">🔊</button><button class="btn small" data-say="${esc(it.en)}" data-rate="0.6">🐢</button><button class="btn small" data-save="${esc(it.en)}" data-ur="${esc(it.ur||'')}">💾 Save</button></div></div>`;
+  }
+  if(it.t==='user')return `<div class="b u">${esc(it.text)}</div>`;
+  if(it.t==='sys')return `<div class="sys ur">${esc(it.text)}</div>`;
+  if(it.t==='fix'){
+    return it.items.map(m=>`<div class="fixc"><div class="said">${esc(m.said)}</div><div class="corr">✅ ${esc(m.correct)}</div><div class="ur">${esc(m.why)}</div><div class="row"><button class="btn small" data-say="${esc(m.correct)}">🔊 صحیح سنیں</button></div></div>`).join('');
+  }
+  if(it.t==='rep'){
+    return `<div class="rep ${it.done?'done':''}" data-rid="${it.id}"><div class="ur">${it.done?'✅ ٹھیک بولا!':'🎤 یہ صحیح جملہ خود دہرائیں:'}</div><div style="font-size:20px;font-weight:700;margin:4px 0">${esc(it.text)}</div><div class="rres"></div>${it.done?'':`<div class="row"><button class="btn small" data-say="${esc(it.text)}">🔊 Listen</button><button class="btn small" data-say="${esc(it.text)}" data-rate="0.6">🐢</button><button class="btn small" data-skip="${it.id}">Skip ➜</button></div>`}</div>`;
+  }
+  return '';
+}
+function drawItem(it){const d=document.createElement('div');d.innerHTML=itemHTML(it);while(d.firstChild)$('#chat').appendChild(d.firstChild)}
+function drawAll(){$('#chat').innerHTML='';chat.forEach(drawItem);scrollEnd()}
+
+$('#chat').addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.say!==undefined)say(t.dataset.say,t.dataset.rate?parseFloat(t.dataset.rate):undefined);
+  else if(t.dataset.save!==undefined){savePoint({en:t.dataset.save,ur:t.dataset.ur,note:''});t.textContent='✅ Saved'}
+  else if(t.dataset.skip){skipPending()}
+});
+
+/* ================= AI ================= */
+function sysPrompt(){
+  const L=LEVELS[lvl()-1];
+  return `You are Nova, a friendly, patient, encouraging AI robot English speaking teacher (introduce yourself as Nova, the learner's AI English teacher) for ONE learner: an Urdu-speaking adult from Pakistan who is learning to speak English. You hold a spoken conversation lesson, one small step at a time.
+
+LEARNER LEVEL NOW: ${L.d}
+Stay strictly at this level in vocabulary, grammar and sentence length. Start easy; the app raises the level automatically when the learner improves.
+
+HOW TO TEACH
+- Say one short thing and ask ONE question or give ONE small speaking task each turn. Never lecture.
+- The learner's text comes from speech recognition or typing. IGNORE capitalization, punctuation and missing apostrophes. Only flag REAL mistakes: wrong grammar, wrong word, unnatural phrasing, wrong word order, and words that look like a clear mispronunciation (the recognizer heard a different, similar-sounding word that makes the sentence odd).
+- Report at most 2 mistakes per turn, the most important first. If the sentence is correct, mistakes must be an empty array and you should praise briefly.
+- If the learner writes in Urdu or Roman Urdu asking for help or meaning, answer helpfully (explain simply) and keep mistakes empty.
+- When there is a mistake: reply_en must gently tell them the correct way and ask them to say the corrected sentence aloud; set repeat_en to the full corrected sentence. Do NOT move on to a new topic until they repeat it.
+- When there is no mistake: praise in a few words, then continue the lesson with the next small question or task. Occasionally teach a new useful word or phrase.
+- Never repeat the same question twice. Use varied everyday topics suited to the level.
+
+OUTPUT: respond with JSON ONLY, exactly this shape:
+{
+ "reply_en": "what the teacher says, in simple English at the learner's level",
+ "reply_ur": "natural, simple Urdu translation of reply_en (Urdu script)",
+ "mistakes": [ {"said": "learner's wrong phrase/sentence", "correct": "the correct sentence", "why_ur": "short simple Urdu explanation of the mistake"} ],
+ "repeat_en": "corrected full sentence to repeat, or empty string",
+ "new_points": [ {"en": "word/phrase/rule taught this turn", "ur": "Urdu meaning", "note_ur": "one short Urdu tip or example, or empty"} ]
+}
+new_points: 0-2 items, only things actually taught or corrected this turn.`;
+}
+
+function parseAI(txt){
+  let s=(txt||'').trim();
+  try{return JSON.parse(s)}catch(e){}
+  s=s.replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
+  try{return JSON.parse(s)}catch(e){}
+  const a=s.indexOf('{'),b=s.lastIndexOf('}');
+  if(a>=0&&b>a){try{return JSON.parse(s.slice(a,b+1))}catch(e){}}
+  return {reply_en:s||'Sorry, can you say that again?',reply_ur:'',mistakes:[],repeat_en:'',new_points:[]};
+}
+
+async function callAI(userText){
+  const key=store.get('key','');
+  if(!key)throw new Error('NOKEY');
+  const contents=hist.concat([{role:'user',parts:[{text:userText}]}]);
+  const body={system_instruction:{parts:[{text:sysPrompt()}]},contents,generationConfig:{responseMimeType:'application/json',temperature:0.7}};
+  const models=[store.get('model','')||'gemini-flash-latest','gemini-flash-latest','gemini-3.5-flash'].filter((v,i,a)=>a.indexOf(v)===i);
+  let last=null;
+  for(const m of models){
+    let r=null;
+    for(let attempt=0;attempt<2;attempt++){
+      const ctl=new AbortController();const to=setTimeout(()=>ctl.abort(),40000);
+      try{
+        r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(m)+':generateContent?key='+encodeURIComponent(key),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctl.signal});
+      }catch(e){clearTimeout(to);throw new Error(e&&e.name==='AbortError'?'TIMEOUT':'NET')}
+      clearTimeout(to);
+      if((r.status===503||r.status===500)&&attempt===0){await new Promise(z=>setTimeout(z,2500));continue}
+      break;
+    }
+    if(r.status===404){last='model '+m;continue}
+    if(r.status===429)throw new Error('RATE');
+    if(r.status===503||r.status===500)throw new Error('SERVER');
+    if(!r.ok){
+      let t='';try{t=await r.text()}catch(e){}
+      if(/API key|API_KEY|PERMISSION|permission|not valid/i.test(t))throw new Error('KEY');
+      if(/location|region|not supported/i.test(t))throw new Error('REGION');
+      throw new Error('HTTP '+r.status+' '+t.slice(0,200));
+    }
+    const j=await r.json();
+    const parts=(j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts)||[];
+    const txt=parts.filter(p=>!p.thought).map(p=>p.text||'').join('');
+    if(!txt){last='empty reply';continue}
+    const res=parseAI(txt);
+    hist=contents.concat([{role:'model',parts:[{text:JSON.stringify({reply_en:res.reply_en||'',repeat_en:res.repeat_en||''})}]}]).slice(-16);
+    while(hist.length&&hist[0].role!=='user')hist.shift();
+    store.set('hist',hist);
+    return res;
+  }
+  throw new Error('MODEL '+last);
+}
+function errText(e){
+  const m=String(e.message||e);
+  if(m==='NOKEY')return 'پہلے API key لگائیں (Teacher یا Settings میں)۔';
+  if(m==='KEY')return 'API key غلط یا بند ہے۔ aistudio.google.com سے نئی بنا کر Settings میں لگائیں۔';
+  if(m==='RATE')return 'ابھی بہت زیادہ درخواستیں ہو گئیں۔ ایک منٹ رک کر دوبارہ بولیں۔';
+  if(m==='TIMEOUT')return 'جواب نہیں آیا (40 سیکنڈ)۔ انٹرنیٹ چیک کریں؛ ہو سکتا ہے Google کی سروس آپ کے نیٹ ورک پر بند ہو۔ Settings میں 🔌 Test دبا کر دیکھیں۔';
+  if(m==='SERVER')return 'Google کا سرور ابھی مصروف ہے۔ تھوڑی دیر بعد دوبارہ بولیں۔';
+  if(m==='REGION')return 'Google کی یہ سروس آپ کے علاقے میں دستیاب نہیں لگتی۔';
+  if(m==='NET')return 'انٹرنیٹ نہیں چل رہا یا سرور تک رسائی نہیں۔ چیک کر کے دوبارہ کوشش کریں۔';
+  return 'خرابی: '+m;
+}
+
+/* ================= Conversation flow ================= */
+function setBusy(b){busy=b;$('#typing').classList.toggle('hidden',!b);$('#send').disabled=b;if(b)scrollEnd()}
+
+async function turn(text,hidden){
+  if(busy)return;
+  text=text.trim();if(!text)return;
+  const hasKey=!!store.get('key','');
+  if(!hasKey){$('#keyBanner').classList.remove('hidden');addItem({t:'sys',text:errText({message:'NOKEY'})});return}
+
+  if(!hidden&&pending){
+    const c=compare(pending.correct,text);
+    if(c.pct>=25){
+      addItem({t:'user',text});
+      const card=document.querySelector(`.rep[data-rid="${pending.id}"] .rres`);
+      if(c.pct>=80){
+        markFixed(pending.id);
+        const idx=chat.findIndex(x=>x.t==='rep'&&x.id===pending.id);if(idx>=0)chat[idx].done=true;
+        pending=null;store.set('pending',null);store.set('chat',chat);drawAll();
+        addItem({t:'sys',text:'✅ بہت خوب! آپ نے صحیح بولا۔'});
+        return turn('[The learner correctly repeated the corrected sentence. Praise in a few words, then continue the lesson with a new small question.]',true);
+      }else{
+        if(card)card.innerHTML=c.html+`<div class="ur muted">${c.pct}% — سرخ الفاظ دوبارہ سن کر بولیں</div>`;
+        else addItem({t:'sys',text:'دوبارہ کوشش کریں: '+c.pct+'%'});
+        return;
+      }
+    }
+    pending=null;store.set('pending',null);
+  }
+
+  if(!hidden)addItem({t:'user',text});
+  setBusy(true);
+  let res;
+  try{res=await callAI(text)}catch(e){setBusy(false);addItem({t:'sys',text:errText(e)});return}
+  setBusy(false);
+
+  const mk=(Array.isArray(res.mistakes)?res.mistakes:[]).filter(m=>m&&m.correct&&m.said).slice(0,2);
+  if(!hidden)updateLevel(mk.length===0);
+
+  const saved=[];
+  if(mk.length){
+    mk.forEach(m=>{const o={id:uid(),said:String(m.said),correct:String(m.correct),why:String(m.why_ur||''),ts:Date.now(),fixed:false,reps:0};saved.push(o);const all=store.get('mist',[]);all.unshift(o);store.set('mist',all.slice(0,300))});
+    addItem({t:'fix',items:mk.map(m=>({said:String(m.said),correct:String(m.correct),why:String(m.why_ur||'')}))});
+  }
+  addItem({t:'teacher',en:String(res.reply_en||''),ur:String(res.reply_ur||'')});
+  if(mk.length){
+    const rt=String(res.repeat_en||mk[0].correct);
+    const rid=saved[0].id;
+    pending={id:rid,correct:rt,mid:rid};store.set('pending',pending);
+    addItem({t:'rep',id:rid,text:rt,done:false});
+  }
+  (Array.isArray(res.new_points)?res.new_points:[]).slice(0,2).forEach(p=>{if(p&&p.en)savePoint({en:String(p.en),ur:String(p.ur||''),note:String(p.note_ur||'')},true)});
+  if(store.get('autoSpeak',true)){say(String(res.reply_en||''));if(mk.length)say(String(res.repeat_en||mk[0].correct),0.7,true)}
+}
+
+function skipPending(){
+  if(!pending)return;
+  const idx=chat.findIndex(x=>x.t==='rep'&&x.id===pending.id);if(idx>=0)chat[idx].done=true;
+  pending=null;store.set('pending',null);store.set('chat',chat);drawAll();
+  turn('[The learner skipped repeating. Gently move on with a new simple question at their level.]',true);
+}
+
+function markFixed(id){
+  const all=store.get('mist',[]);const m=all.find(x=>x.id===id);
+  if(m){m.fixed=true;m.reps=(m.reps||0)+1;m.fts=Date.now();store.set('mist',all)}
+}
+
+/* ================= Points ================= */
+function savePoint(p,silent){
+  const all=store.get('pts',[]);
+  if(all.some(x=>x.en.toLowerCase()===p.en.toLowerCase()))return;
+  all.unshift({id:uid(),en:p.en,ur:p.ur||'',note:p.note||'',ts:Date.now()});
+  store.set('pts',all.slice(0,500));
+  if(silent)addItem({t:'sys',text:'💾 محفوظ ہو گیا: '+p.en});
+}
+function renderPoints(){
+  const all=store.get('pts',[]);
+  $('#pList').innerHTML=all.length?all.map(p=>`<div class="item"><div style="font-size:18px;font-weight:700">${esc(p.en)}</div><div class="ur">${esc(p.ur)}</div>${p.note?`<div class="ur muted">${esc(p.note)}</div>`:''}<div class="row"><button class="btn small" data-say="${esc(p.en)}">🔊</button><button class="btn small red" data-del="${p.id}">🗑</button><small>${new Date(p.ts).toLocaleDateString('en-GB')}</small></div></div>`).join(''):'<div class="ur">ابھی کچھ محفوظ نہیں۔ ٹیچر کے ساتھ بات کریں، سیکھے ہوئے پوائنٹس خود یہاں آ جائیں گے۔</div>';
+}
+$('#pList').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.say!==undefined)say(b.dataset.say);
+  if(b.dataset.del){store.set('pts',store.get('pts',[]).filter(x=>x.id!==b.dataset.del));renderPoints()}
+});
+
+/* ================= Mistakes tab ================= */
+let mf='pending';
+function isToday(ts){return new Date(ts).toDateString()===new Date().toDateString()}
+function renderMist(){
+  const all=store.get('mist',[]);
+  $('#sToday').textContent=all.filter(m=>isToday(m.ts)).length;
+  $('#sFixed').textContent=all.filter(m=>m.fixed&&isToday(m.fts||m.ts)).length;
+  $('#sPend').textContent=all.filter(m=>!m.fixed).length;
+  let list=all;
+  if(mf==='pending')list=all.filter(m=>!m.fixed);
+  else if(mf==='today')list=all.filter(m=>isToday(m.ts));
+  else if(mf==='fixed')list=all.filter(m=>m.fixed);
+  $('#mList').innerHTML=list.length?list.map(m=>`<div class="item" data-mid="${m.id}"><div class="muted" style="font-size:13px">${new Date(m.ts).toLocaleDateString('en-GB')} ${m.fixed?'· ✅ ٹھیک ('+(m.reps||1)+'×)':''}</div><div style="color:#fca5a5;text-decoration:line-through;font-size:16px">${esc(m.said)}</div><div style="color:#86efac;font-size:18px;font-weight:700">✅ ${esc(m.correct)}</div><div class="ur muted">${esc(m.why)}</div><div class="mres"></div><div class="row"><button class="btn small" data-say="${esc(m.correct)}">🔊</button><button class="btn small mic" data-drill="${m.id}">🎤 Repeat</button><button class="btn small red" data-del="${m.id}">🗑</button></div></div>`).join(''):'<div class="ur">یہاں کچھ نہیں 🎉</div>';
+}
+$('#mFilter').addEventListener('click',e=>{
+  const c=e.target.closest('.chip');if(!c)return;
+  document.querySelectorAll('#mFilter .chip').forEach(x=>x.classList.toggle('on',x===c));
+  mf=c.dataset.f;renderMist();
+});
+$('#mList').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.say!==undefined)return say(b.dataset.say);
+  if(b.dataset.del){store.set('mist',store.get('mist',[]).filter(x=>x.id!==b.dataset.del));return renderMist()}
+  if(b.dataset.drill){
+    const id=b.dataset.drill;const m=store.get('mist',[]).find(x=>x.id===id);if(!m)return;
+    const out=b.closest('.item').querySelector('.mres');
+    listen(b,t=>{out.textContent='🎧 '+t},t=>{
+      const c=compare(m.correct,t);
+      out.innerHTML=c.html+`<div class="ur muted">${c.pct}%</div>`;
+      if(c.pct>=80){markFixed(id);setTimeout(renderMist,1500)}
+    },msg=>{out.textContent=msg});
+  }
+});
+
+/* ================= Settings ================= */
+function saveKey(v){
+  v=(v||'').trim();if(!v)return;
+  store.set('key',v);$('#keyBanner').classList.add('hidden');$('#keyIn').value='';$('#keyIn2').value='';
+  addItem({t:'sys',text:'✅ API key محفوظ ہو گئی۔'});
+  if(!chat.some(x=>x.t==='teacher'))startLesson();
+}
+$('#keySave').onclick=()=>saveKey($('#keyIn').value);
+$('#keySave2').onclick=()=>{
+  const m=$('#modelIn').value.trim();store.set('model',m);
+  if($('#keyIn2').value.trim())saveKey($('#keyIn2').value);
+  alert('Saved');
+};
+$('#lvSel').innerHTML=LEVELS.map((l,i)=>`<option value="${i+1}">${l.n}</option>`).join('');
+$('#lvSel').onchange=()=>{store.set('level',parseInt($('#lvSel').value));store.set('win',[]);renderBar()};
+$('#optSpeak').onchange=()=>store.set('autoSpeak',$('#optSpeak').checked);
+$('#optUr').onchange=()=>{store.set('showUr',$('#optUr').checked);drawAll()};
+$('#optRate').onchange=()=>store.set('rate',parseFloat($('#optRate').value));
+$('#newLesson').onclick=()=>{
+  if(!confirm('نیا لیسن شروع کریں؟ (چیٹ صاف ہوگی، غلطیاں اور پوائنٹس محفوظ رہیں گے)'))return;
+  chat=[];hist=[];pending=null;store.set('chat',[]);store.set('hist',[]);store.set('pending',null);drawAll();startLesson();
+  document.querySelector('nav [data-t=teach]').click();
+};
+$('#resetAll').onclick=()=>{
+  if(confirm('سارا ڈیٹا (PIN، غلطیاں، پوائنٹس، API key) ختم کر دیں؟')){
+    ['pin','key','model','level','win','chat','hist','pending','mist','pts','autoSpeak','showUr','rate'].forEach(k=>localStorage.removeItem(k));
+    chat=[];hist=[];pending=null;initLock();
+  }
+};
+
+/* ================= Input handlers ================= */
+$('#send').onclick=()=>{const v=$('#msg').value;$('#msg').value='';turn(v,false)};
+$('#msg').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#send').click()}});
+$('#mic').onclick=()=>{
+  if(busy)return;
+  listen($('#mic'),t=>{$('#msg').value=t},t=>{$('#msg').value='';turn(t,false)},m=>{addItem({t:'sys',text:m})});
+};
+
+/* ================= Tabs & start ================= */
+document.querySelectorAll('nav div').forEach(d=>d.onclick=()=>{
+  document.querySelectorAll('nav div').forEach(x=>x.classList.toggle('on',x===d));
+  ['teach','mist','pts','set'].forEach(t=>$('#tab-'+t).classList.toggle('hidden',t!==d.dataset.t));
+  if(d.dataset.t==='mist')renderMist();
+  if(d.dataset.t==='pts')renderPoints();
+  if(d.dataset.t==='set'){$('#lvSel').value=lvl();$('#modelIn').value=store.get('model','');}
+  if(d.dataset.t==='teach')scrollEnd();
+});
+function startLesson(){turn('[Start the lesson now: greet the learner warmly in very simple English, introduce yourself as their teacher, and ask one easy first question.]',true)}
+function openApp(){
+  $('#lock').classList.add('hidden');$('#app').classList.remove('hidden');$('#nav').classList.remove('hidden');
+  $('#optSpeak').checked=store.get('autoSpeak',true);$('#optUr').checked=store.get('showUr',true);$('#optRate').value=String(store.get('rate',1));
+  renderBar();drawAll();
+  if(!store.get('key',''))$('#keyBanner').classList.remove('hidden');
+  else if(!chat.some(x=>x.t==='teacher'))startLesson();
+}
+
+/* ================= Avatar (Miss Sara) ================= */
+function avatarSVG(){return `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="hd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1f5f9"/><stop offset="1" stop-color="#94a3b8"/></linearGradient>
+<linearGradient id="bd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#64748b"/><stop offset="1" stop-color="#1e293b"/></linearGradient>
+<radialGradient id="gl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#67e8f9"/><stop offset="1" stop-color="#0891b2"/></radialGradient>
+</defs>
+<g class="bot">
+<path d="M18 124 Q18 96 60 96 Q102 96 102 124Z" fill="url(#bd)"/>
+<circle class="chest" cx="60" cy="112" r="5" fill="#22d3ee"/>
+<rect x="48" y="86" width="24" height="12" rx="4" fill="#475569"/>
+<line x1="60" y1="14" x2="60" y2="26" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
+<circle class="ant" cx="60" cy="11" r="5" fill="#22d3ee"/>
+<rect x="13" y="48" width="10" height="20" rx="5" fill="#0891b2"/>
+<rect x="97" y="48" width="10" height="20" rx="5" fill="#0891b2"/>
+<rect x="20" y="24" width="80" height="66" rx="24" fill="url(#hd)"/>
+<rect x="29" y="33" width="62" height="46" rx="16" fill="#0b1220" stroke="#38bdf8" stroke-width="1.6"/>
+<g class="look">
+<g class="eye"><ellipse cx="46" cy="53" rx="7" ry="8.5" fill="url(#gl)"/></g>
+<g class="eye"><ellipse cx="74" cy="53" rx="7" ry="8.5" fill="url(#gl)"/></g>
+</g>
+<rect class="mouth" x="47" y="66" width="26" height="4.5" rx="2.25" fill="#22d3ee"/>
+<circle cx="37" cy="68" r="2.4" fill="#22d3ee" opacity=".35"/><circle cx="83" cy="68" r="2.4" fill="#22d3ee" opacity=".35"/>
+</g>
+</svg>`}
+$('#avatar').innerHTML=avatarSVG();
+setInterval(()=>{const sp=('speechSynthesis' in window)&&speechSynthesis.speaking;$('#avatar').classList.toggle('talk',!!sp)},200);
+
+/* ================= Install as app ================= */
+let installEv=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEv=e});
+$('#installBtn').onclick=async()=>{
+  if(installEv){installEv.prompt();try{await installEv.userChoice}catch(e){}installEv=null}
+  else alert('Chrome کے ⋮ مینو میں جا کر "Install app" یا "Add to Home screen" دبائیں۔');
+};
+if(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches){$('#installBtn').classList.add('hidden');$('#installHelp').classList.add('hidden')}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
+
+/* ================= Test AI ================= */
+$('#testAI').onclick=async()=>{
+  const key=store.get('key','');if(!key){alert('پہلے API key لگائیں');return}
+  const m=store.get('model','')||'gemini-flash-latest';
+  const ctl=new AbortController();const to=setTimeout(()=>ctl.abort(),25000);
+  try{
+    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(m)+':generateContent?key='+encodeURIComponent(key),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:'Say hello in 3 words.'}]}]}),signal:ctl.signal});
+    const t=await r.text();clearTimeout(to);
+    alert('Status: '+r.status+'\n'+t.slice(0,350));
+  }catch(e){clearTimeout(to);alert('Failed: '+(e&&e.name==='AbortError'?'25 سیکنڈ میں جواب نہیں آیا (نیٹ ورک بلاک/سست)':e.message))}
+};
+
+initLock();
+</script>
+</body>
+</html>
